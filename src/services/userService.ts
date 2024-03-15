@@ -5,28 +5,29 @@ import { DataSource, Repository } from "typeorm";
 @Injectable()
 export class UserService
 {
+    private readonly dataSource: DataSource;
     private readonly users: Repository<User>;
 
 
     constructor(dataSource: DataSource)
     {
+        this.dataSource = dataSource;
         this.users = dataSource.getRepository(User);
     }
 
-    create(user: User)
+    async create(user: User)
     {
-        
-        this.users.save(user);
+        const createdUser = await this.users.save(user);
+        return createdUser
     }
-    getAll()
+    async getAll()
     {
-        return this.users;
+        return await this.users.find();
     }
-    get(id: number)
+    async get(id: number)
     {
-        let user: User = null;
-        this.users.findOne({
-            "where": { id: id }
+        const user = await this.users.findOne({
+            "where": { id }
         })
         
         return user;

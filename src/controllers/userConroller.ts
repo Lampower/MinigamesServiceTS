@@ -15,17 +15,17 @@ export class UserController {
   }
 
   @Get()
-  get(@Req() request: Request,@Res() respone: Response) 
+  async get(@Req() request: Request,@Res() respone: Response) 
   {
     const {id} = request.query;
     if (id == null)
     {
-      const users = this.userService.getAll();
+      const users = await this.userService.getAll();
       return respone.json(users);
     }
 
     const userId = Number(id);
-    const user = this.userService.get(userId);
+    const user = await this.userService.get(userId);
     if (user == null)
     {
       respone.status(HttpStatus.NOT_FOUND);
@@ -37,7 +37,7 @@ export class UserController {
   }
 
   @Post("/register")
-  register(@Req() request: Request, @Res() response: Response) 
+  async register(@Req() request: Request, @Res() response: Response) 
   {
     const {username, password} = request.body
     if (username == null || password == null) 
@@ -51,12 +51,12 @@ export class UserController {
     user.username = username;
     user.password = password;
 
-    this.userService.create(user);
-    response.json(`user with name: ${username} and password: ${password} is created`);
+    const createdUser = await this.userService.create(user);
+    response.json(`created: \n ${createdUser}`);
   }
 
   @Post("/login")
-  login(@Req() request: Request, @Res() response: Response)
+  async login(@Req() request: Request, @Res() response: Response)
   {
     const {username, password} = request.body
     if (username == null || password == null) 
