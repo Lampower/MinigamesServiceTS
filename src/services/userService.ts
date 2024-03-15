@@ -1,14 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "src/models/user";
+import { DataSource, Repository } from "typeorm";
 
 @Injectable()
 export class UserService
 {
-    private readonly users: User[] = [];
+    private readonly users: Repository<User>;
+
+
+    constructor(dataSource: DataSource)
+    {
+        this.users = dataSource.getRepository(User);
+    }
 
     create(user: User)
     {
-        this.users.push(user);
+        
+        this.users.save(user);
     }
     getAll()
     {
@@ -17,13 +25,9 @@ export class UserService
     get(id: number)
     {
         let user: User = null;
-        this.users.forEach(u => {
-            if (u.id == id)
-            {
-                user = u
-                return;
-            }
-        });
+        this.users.findOne({
+            "where": { id: id }
+        })
         
         return user;
     }
