@@ -1,21 +1,36 @@
-import { Controller, Req, Get, Post, Res } from '@nestjs/common';
-import { Request, Response, response } from 'express';
+import { Controller, Req, Get, Post, Res, HttpStatus } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { JwtService } from "../services/jwtService"
+import { UserService } from 'src/services/userService';
 
 @Controller('user')
 export class UserController {
   /**
    *
    */
-  constructor(readonly jwtService: JwtService) 
+  constructor(readonly jwtService: JwtService, readonly userService: UserService) 
   {
 
   }
 
   @Get()
-  getAll(@Res() respone: Response) 
+  getAll(@Req() request: Request, @Res() respone: Response) 
   {
-    return respone.json("All users");
+    const {id} = request.query
+    if (id == null)
+    {
+      const users = this.userService.getAll()
+      return respone.json(users);
+    }
+    const userId = Number(id);
+    const user = this.userService.get(userId);
+    if (user == null)
+    {
+      return respone.status(HttpStatus.NOT_FOUND); 
+    }
+
+    respone.json();
+    
   }
 
   @Post("/register")
@@ -37,7 +52,7 @@ export class UserController {
     const {username, password} = request.body
     if (username == null || password == null) 
     {
-      response.status(404);
+      response.status(HttpStatus.BAD_REQUEST);
       response.json("Error");
     }
     const claims = {username};
