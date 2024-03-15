@@ -16,7 +16,14 @@ export class UserService
     }
     get(id: number)
     {
-        const user = this.users.find((u) => u.id == id);
+        let user: User = null;
+        this.users.forEach(u => {
+            if (u.id == id)
+            {
+                user = u
+                return;
+            }
+        });
         
         return user;
     }
