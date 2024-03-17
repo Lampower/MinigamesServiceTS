@@ -1,6 +1,6 @@
-import { JwtService } from "./jwtService";
+import { AuthService } from "./authService";
 import { UserService } from "./userService";
 
 
 
-export const services = [JwtService, UserService]
+export const services = [AuthService, UserService]

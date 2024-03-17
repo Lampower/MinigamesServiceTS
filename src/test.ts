@@ -1,7 +1,4 @@
 
-const obj = {
-    a: 4,
-    b: 3
-}
+const obj = undefined
 
-console.log(Object.keys(obj))
+console.log(obj == null)

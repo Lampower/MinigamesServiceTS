@@ -1,71 +1,47 @@
 import { Controller, Req, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { JwtService } from "../services/jwtService"
+import { AuthService } from "../services/authService"
 import { UserService } from 'src/services/userService';
 import { User } from 'src/models/user';
 
 @Controller('user')
 export class UserController {
-  /**
-   *
-   */
-  constructor(readonly jwtService: JwtService, readonly userService: UserService) 
+  constructor(readonly jwtService: AuthService, readonly userService: UserService) 
   {
 
   }
 
-  @Get()
+  @Get(":id")
   async get(@Req() request: Request,@Res() respone: Response) 
   {
-    const {id} = request.query;
-    if (id == null)
-    {
-      const users = await this.userService.getAll();
-      return respone.json(users);
-    }
-
+    const {id} = request.params;
     const userId = Number(id);
-    const user = await this.userService.get(userId);
-    if (user == null)
-    {
-      respone.status(HttpStatus.NOT_FOUND);
-      return respone.json("Not Found"); 
-    }
+
+    const user = await this.userService.getById(userId);
 
     respone.json(user);
     
   }
-
-  @Post("/register")
-  async register(@Req() request: Request, @Res() response: Response) 
+  @Get()
+  async getMany(@Req() request: Request, @Res() response: Response)
   {
-    const {username, password} = request.body
-    if (username == null || password == null) 
+    const {username} = request.query;
+    let users = [];
+    if (!username)
     {
-      response.status(404);
-      response.json("Error");
+      users = await this.userService.getAll();
     }
-
-    const user = new User(); 
-    user.id = 0;
-    user.username = username;
-    user.password = password;
-
-    const createdUser = await this.userService.create(user);
-    response.json(`created: \n ${createdUser}`);
+    if (username)
+    {
+      users = await this.userService.getByUsername();
+    }
+    response.json(users);
   }
 
-  @Post("/login")
-  async login(@Req() request: Request, @Res() response: Response)
+ 
+  @Get("hello")
+  async hello(@Req() request: Request, @Res() response: Response)
   {
-    const {username, password} = request.body
-    if (username == null || password == null) 
-    {
-      response.status(HttpStatus.BAD_REQUEST);
-      response.json("Error");
-    }
-    const claims = {username};
-    
-    this.jwtService.generateToken(claims);
+    response.json("Hello world only for auth");
   }
 }

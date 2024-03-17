@@ -20,16 +20,38 @@ export class UserService
         const createdUser = await this.users.save(user);
         return createdUser
     }
+    async check(username: string, password: string)
+    {
+        const user = await this.users.findOne({where: {username}});
+
+        if (user.password == password)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+
+    async getById(id: number = null)
+    {
+        return this.users.findOne({where: {id: id}});
+    }
+    async getByUsername(username: string = null)
+    {
+        return this.users.find({where: {username: username}});
+    }
+    async getFirstUsernames(amount: number = null)
+    {
+        return this.users.find({
+            select: ["username"],
+            take: amount
+        });
+    }
     async getAll()
     {
-        return await this.users.find();
-    }
-    async get(id: number)
-    {
-        const user = await this.users.findOne({
-            "where": { id }
-        })
-        
-        return user;
+        return this.users.find();
     }
 }
