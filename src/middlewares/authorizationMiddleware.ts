@@ -12,27 +12,27 @@ export class AuthMiddleware implements NestMiddleware
     {
         this.authService = authService
     }
-    use(req: Request, res: Response, next: (error?: any) => void) {
+    async use(req: Request, res: Response, next: (error?: any) => void) {
         const token_data = req.headers["authorization"];
-        if (token_data == null)
+        if (!token_data)
         {
             res.status(HttpStatus.UNAUTHORIZED)
             return res.json("You are not authorized")
         }
-        console.log(token_data) 
         const [token_type, token] = token_data.split(" ");
         if (token_type != "Bearer")
         {
             res.status(HttpStatus.UNAUTHORIZED)
             return res.json("You are not authorized")
         }
-        if (!this.authService.verify(token))
+        const payload = await this.authService.verify(token);
+        if (!payload)
         {
             res.status(HttpStatus.UNAUTHORIZED)
             return res.json("You are not authorized")
         }
-        
 
+        req.body = payload;
         next();
     }
 
