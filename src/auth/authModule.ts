@@ -1,15 +1,15 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
-import { AppModule } from 'src/app.module';
-import { AuthController } from 'src/controllers/authController';
-import { UserController } from 'src/controllers/userConroller';
+import { AuthController } from 'src/auth/authController';
+import { UserController } from 'src/user/userConroller';
 import { AuthMiddleware } from 'src/middlewares/authorizationMiddleware';
-import { AuthService } from 'src/services/authService';
-import { UserService } from 'src/services/userService';
+import { AuthService } from 'src/auth/authService';
+import { UserModule } from 'src/user/userModule';
 
 @Module({
-    imports: [],
+    imports: [UserModule],
     controllers: [AuthController],
-    providers: [UserService, AuthService]
+    providers: [AuthService],
+    exports: [AuthService]
 })
 export class AuthModule implements NestModule 
 {

@@ -1,8 +1,8 @@
 import { Controller, HttpStatus, Post, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
 import { User } from "src/models/user";
-import { AuthService } from "src/services/authService";
-import { UserService } from "src/services/userService";
+import { AuthService } from "src/auth/authService";
+import { UserService } from "src/user/userService";
 
 
 @Controller("auth")
@@ -34,28 +34,29 @@ export class AuthController
       user.password = password;
   
       const createdUser = await this.userService.create(user);
-      console.log(this.jwtService)
+      console.log(createdUser);
       const token = await this.jwtService.generateToken(createdUser);
 
-      response.json(token);
+      response.json({token: token});
     }
   
     @Post("/login")
     async login(@Req() request: Request, @Res() response: Response)
     {
       const {username, password} = request.body
-      if (username == null || password == null) 
+      if (username == null || password == null || !this.userService.check(username, password)) 
       {
         response.status(HttpStatus.BAD_REQUEST);
         response.json("Error");
       }
-      if (!this.userService.check(username, password))
+      const user = await this.userService.getByUsername(username);
+      if (!user)
       {
-        response.status(HttpStatus.BAD_REQUEST);
-        response.json("Wrong username or password");
+        response.status(HttpStatus.BAD_GATEWAY).json("Server Error");
       }
-      const user = this.userService.getByUsername(username);
-      
-      this.jwtService.generateToken(user);
+      console.log(user);
+      const token = await this.jwtService.generateToken(user[0]);
+
+      response.json({token: token});
     }
 }

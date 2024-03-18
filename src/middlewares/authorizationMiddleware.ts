@@ -1,7 +1,7 @@
-import { HttpCode, HttpStatus, Injectable, NestMiddleware } from "@nestjs/common";
+import { HttpCode, HttpStatus, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Request, Response } from "express";
-import { AuthService } from "src/services/authService";
+import { AuthService } from "src/auth/authService";
 
 
 @Injectable()
@@ -13,27 +13,16 @@ export class AuthMiddleware implements NestMiddleware
         this.authService = authService
     }
     async use(req: Request, res: Response, next: (error?: any) => void) {
-        const token_data = req.headers["authorization"];
-        if (!token_data)
-        {
-            res.status(HttpStatus.UNAUTHORIZED)
-            return res.json("You are not authorized")
+        try {
+            const token_data = req.headers["authorization"];
+            const [token_type, token] = token_data.split(" ");
+            const payload = await this.authService.verifyAsync(token);
+            req["user"] = payload;
+            next();
+        } 
+        catch (error) {
+            throw new UnauthorizedException();
         }
-        const [token_type, token] = token_data.split(" ");
-        if (token_type != "Bearer")
-        {
-            res.status(HttpStatus.UNAUTHORIZED)
-            return res.json("You are not authorized")
-        }
-        const payload = await this.authService.verify(token);
-        if (!payload)
-        {
-            res.status(HttpStatus.UNAUTHORIZED)
-            return res.json("You are not authorized")
-        }
-
-        req.body = payload;
-        next();
     }
 
 }

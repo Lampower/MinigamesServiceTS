@@ -1,26 +1,34 @@
 import { Controller, Req, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from "../services/authService"
-import { UserService } from 'src/services/userService';
 import { User } from 'src/models/user';
+import { UserService } from './userService';
 
 @Controller('user')
 export class UserController {
-  constructor(readonly jwtService: AuthService, readonly userService: UserService) 
+  constructor(
+    readonly userService: UserService
+    ) 
   {
 
   }
 
-  @Get(":id")
+  @Get("me")
   async get(@Req() request: Request,@Res() respone: Response) 
   {
-    const {id} = request.params;
-    const userId = Number(id);
-
-    const user = await this.userService.getById(userId);
+    const {payload} = request["user"];
+    console.log(payload);
+    const userId = Number(payload.id)
+    if (!userId)
+    {
+      respone.status(HttpStatus.BAD_GATEWAY).json("Server problem");
+    }
+    const user = await this.userService.getById(userId)
+    if (!user)
+    {
+      respone.status(200).json("User doesnt exist");
+    }
 
     respone.json(user);
-    
   }
   @Get()
   async getMany(@Req() request: Request, @Res() response: Response)
@@ -39,9 +47,5 @@ export class UserController {
   }
 
  
-  @Get("hello")
-  async hello(@Req() request: Request, @Res() response: Response)
-  {
-    response.json("Hello world only for auth");
-  }
+  
 }

@@ -1,9 +1,8 @@
 import { JwtService } from "@nestjs/jwt"
-import { UserService } from "./userService"
 
 export class AuthService 
 {
-    private readonly jwtService: JwtService = new JwtService()
+    private readonly jwtService: JwtService = new JwtService({})
 
     async generateToken(payload: any): Promise<string>
     {
@@ -14,11 +13,12 @@ export class AuthService
         return token;
     }
 
-    async verify(token: string): Promise<any>
+    async verifyAsync(token: string): Promise<any>
     {
         const payload = await this.jwtService.verifyAsync(token, {
             secret: "some secret bullshit"
         });
+        console.log(payload);
         return payload;
     }
 }

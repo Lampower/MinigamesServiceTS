@@ -37,21 +37,21 @@ export class UserService
 
     async getById(id: number = null)
     {
-        return this.users.findOne({where: {id: id}});
+        return await this.users.findOne({where: {id: id}});
     }
     async getByUsername(username: string = null)
     {
-        return this.users.find({where: {username: username}});
+        return await this.users.find({where: {username: username}});
     }
     async getFirstUsernames(amount: number = null)
     {
-        return this.users.find({
+        return await this.users.find({
             select: ["username"],
             take: amount
         });
     }
     async getAll()
     {
-        return this.users.find();
+        return  await this.users.find();
     }
 }
