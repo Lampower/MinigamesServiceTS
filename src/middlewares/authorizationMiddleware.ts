@@ -1,5 +1,6 @@
 import { HttpCode, HttpStatus, Injectable, NestMiddleware, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { time } from "console";
 import { Request, Response } from "express";
 import { AuthService } from "src/auth/authService";
 
@@ -17,6 +18,7 @@ export class AuthMiddleware implements NestMiddleware
             const token_data = req.headers["authorization"];
             const [token_type, token] = token_data.split(" ");
             const payload = await this.authService.verifyAsync(token);
+            const iat = payload["iat"];
             req["user"] = payload;
             next();
         } 

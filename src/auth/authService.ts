@@ -18,7 +18,6 @@ export class AuthService
         const payload = await this.jwtService.verifyAsync(token, {
             secret: "some secret bullshit"
         });
-        console.log(payload);
         return payload;
     }
 }

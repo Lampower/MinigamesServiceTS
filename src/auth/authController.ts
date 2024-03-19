@@ -1,8 +1,9 @@
-import { Controller, HttpStatus, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, HttpStatus, Post, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
 import { User } from "src/models/user";
 import { AuthService } from "src/auth/authService";
 import { UserService } from "src/user/userService";
+import { UserCreateDto } from "src/user/dto/userCreateDto";
 
 
 @Controller("auth")
@@ -19,31 +20,26 @@ export class AuthController
     }
 
     @Post("/register")
-    async register(@Req() request: Request, @Res() response: Response) 
+    async register(@Body() userDto: UserCreateDto, @Res() response: Response) 
     {
-      const {username, password} = request.body
-      if (username == null || password == null) 
+      if (userDto.username == null || userDto.password == null) 
       {
         response.status(404);
         response.json("Error");
       }
   
-      const user = new User(); 
-      user.id = 0;
-      user.username = username;
-      user.password = password;
+ 
   
-      const createdUser = await this.userService.create(user);
-      console.log(createdUser);
+      const createdUser = await this.userService.create(userDto);
       const token = await this.jwtService.generateToken(createdUser);
 
       response.json({token: token});
     }
   
     @Post("/login")
-    async login(@Req() request: Request, @Res() response: Response)
+    async login(@Body() userDto: UserCreateDto, @Res() response: Response)
     {
-      const {username, password} = request.body
+      const {username, password} = userDto;
       if (username == null || password == null || !this.userService.check(username, password)) 
       {
         response.status(HttpStatus.BAD_REQUEST);
@@ -54,8 +50,7 @@ export class AuthController
       {
         response.status(HttpStatus.BAD_GATEWAY).json("Server Error");
       }
-      console.log(user);
-      const token = await this.jwtService.generateToken(user[0]);
+      const token = await this.jwtService.generateToken(user);
 
       response.json({token: token});
     }

@@ -15,37 +15,19 @@ export class UserController {
   @Get("me")
   async get(@Req() request: Request,@Res() respone: Response) 
   {
-    const {payload} = request["user"];
-    console.log(payload);
+    const {payload, iat} = request["user"];
     const userId = Number(payload.id)
     if (!userId)
     {
       respone.status(HttpStatus.BAD_GATEWAY).json("Server problem");
+      return;
     }
     const user = await this.userService.getById(userId)
     if (!user)
     {
       respone.status(200).json("User doesnt exist");
+      return;
     }
-
     respone.json(user);
   }
-  @Get()
-  async getMany(@Req() request: Request, @Res() response: Response)
-  {
-    const {username} = request.query;
-    let users = [];
-    if (!username)
-    {
-      users = await this.userService.getAll();
-    }
-    if (username)
-    {
-      users = await this.userService.getByUsername();
-    }
-    response.json(users);
-  }
-
- 
-  
 }

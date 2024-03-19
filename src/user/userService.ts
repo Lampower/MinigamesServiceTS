@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "src/models/user";
 import { DataSource, Repository } from "typeorm";
+import { UserCreateDto } from "./dto/userCreateDto";
 
 @Injectable()
 export class UserService
@@ -15,7 +16,7 @@ export class UserService
         this.users = dataSource.getRepository(User);
     }
 
-    async create(user: User)
+    async create(user: UserCreateDto)
     {
         const createdUser = await this.users.save(user);
         return createdUser
@@ -23,14 +24,13 @@ export class UserService
     async check(username: string, password: string)
     {
         const user = await this.users.findOne({where: {username}});
-
-        if (user.password == password)
+        if (!user || user.password !== password)
         {
-            return true;
+            return false;
         }
         else
         {
-            return false;
+            return true;
         }
         
     }
@@ -41,7 +41,7 @@ export class UserService
     }
     async getByUsername(username: string = null)
     {
-        return await this.users.find({where: {username: username}});
+        return await this.users.findOne({where: {username: username}});
     }
     async getFirstUsernames(amount: number = null)
     {
