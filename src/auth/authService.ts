@@ -8,7 +8,7 @@ export class AuthService
     {
 
         const token = await this.jwtService.signAsync({payload}, {
-            secret: "some secret bullshit"
+            secret: process.env.SECRET_KEY
         });
         return token;
     }
@@ -16,7 +16,7 @@ export class AuthService
     async verifyAsync(token: string): Promise<any>
     {
         const payload = await this.jwtService.verifyAsync(token, {
-            secret: "some secret bullshit"
+            secret: process.env.SECRET_KEY
         });
         return payload;
     }

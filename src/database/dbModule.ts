@@ -8,11 +8,11 @@ import { CookieData } from "./models/cookieData";
     imports: [
         TypeOrmModule.forRoot({
           type: "postgres",
-          host: "localhost",
-          port: 5432,
-          username: "postgres",
-          password: "superuser",
-          database: "minigames",
+          host: process.env.PG_HOST,
+          port: Number(process.env.PG_PORT),
+          username: process.env.PG_USERNAME,
+          password: process.env.PG_PASSWORD,
+          database: process.env.PG_DATABASE,
           synchronize: true,
           logging: false,
           entities: [User, CookieData],
