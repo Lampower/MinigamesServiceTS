@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "./user";
 
 @Entity()
 export class CookieData
@@ -8,4 +9,8 @@ export class CookieData
 
     @Column()
     public amount: number
+
+    @OneToOne(() => User)
+    @JoinColumn()
+    public user: User
 }

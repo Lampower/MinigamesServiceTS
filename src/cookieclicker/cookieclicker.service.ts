@@ -17,10 +17,11 @@ export class CookieClickerService {
 
     async create(userId: number)
     {
-        const cookieData = await this.cookies.save(new CookieData())  
         const user = await this.userService.getById(userId);
-        user.cookieData = cookieData
-        this.userService.update(user.id, user);
+        const cookieDataCreate = new CookieData();
+        cookieDataCreate.user = user;
+        const cookieData = await this.cookies.save(cookieDataCreate);
+        return cookieData
     }
 
     async getById(id: number)

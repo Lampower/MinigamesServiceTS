@@ -9,12 +9,14 @@ async function bootstrap() {
   const config = new DocumentBuilder()
   .setTitle("MinigamesService")
   .setDescription("Desc")
+  .addBasicAuth()
   .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  SwaggerModule.setup("swaggerApi", app, document);
 
   await app.listen(PORT, () => {
     console.log(`server port is ${PORT}`)
   });
 }
+
 bootstrap();

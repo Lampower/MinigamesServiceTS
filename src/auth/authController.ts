@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { AuthService } from "src/auth/authService";
 import { UserService } from "src/user/userService";
 import { UserCreateDto } from "src/user/dto/userCreateDto";
+import { UserPayload } from "src/user/dto/userPayload";
 
 
 @Controller("auth")
@@ -30,7 +31,10 @@ export class AuthController
  
   
       const createdUser = await this.userService.create(userDto);
-      const token = await this.jwtService.generateToken(createdUser);
+      const userPayload = new UserPayload();
+      userPayload.id = createdUser.id;
+      userPayload.username = createdUser.username;
+      const token = await this.jwtService.generateToken(userPayload);
 
       response.json({token: token});
     }
@@ -49,7 +53,12 @@ export class AuthController
       {
         response.status(HttpStatus.BAD_GATEWAY).json("Server Error");
       }
-      const token = await this.jwtService.generateToken(user);
+
+      const userPayload = new UserPayload();
+      userPayload.id = user.id;
+      userPayload.username = user.username;
+
+      const token = await this.jwtService.generateToken(userPayload);
 
       response.json({token: token});
     }

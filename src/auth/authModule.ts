@@ -4,6 +4,7 @@ import { UserController } from 'src/user/userConroller';
 import { AuthMiddleware } from 'src/middlewares/authorizationMiddleware';
 import { AuthService } from 'src/auth/authService';
 import { UserModule } from 'src/user/userModule';
+import { CookieClickerController } from 'src/cookieclicker/cookieclicker.controller';
 
 @Module({
     imports: [UserModule],
@@ -17,7 +18,7 @@ export class AuthModule implements NestModule
         consumer
             .apply(AuthMiddleware)
             .forRoutes(
-                UserController
+                UserController, CookieClickerController
             );
     }
 }

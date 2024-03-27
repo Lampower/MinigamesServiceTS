@@ -24,14 +24,7 @@ export class UserService
     async check(username: string, password: string)
     {
         const user = await this.users.findOne({where: {username}});
-        if (!user || user.password !== password)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return user && user.password === password;
         
     }
 

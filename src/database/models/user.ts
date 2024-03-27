@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm"
-import { CookieData } from "./cookieData"
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class User
@@ -13,7 +12,5 @@ export class User
     @Column()
     public password: string
 
-    @OneToOne(() => CookieData)
-    @JoinColumn()
-    public cookieData: CookieData
+    
 }

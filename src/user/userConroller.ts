@@ -1,5 +1,5 @@
 import { Controller, Req, Get, Post, Res, HttpStatus } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Request, response, Response } from 'express';
 import { UserService } from './userService';
 
 @Controller('user')
@@ -28,5 +28,11 @@ export class UserController {
       return;
     }
     respone.json(user);
+  }
+  @Get()
+  async getAll(@Res() response: Response)
+  {
+    const users = await this.userService.getAll();
+    response.json(users);
   }
 }
