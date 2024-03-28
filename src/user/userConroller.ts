@@ -1,6 +1,7 @@
 import { Controller, Req, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Request, response, Response } from 'express';
 import { UserService } from './userService';
+import { UserPayload } from './dto/userPayload';
 
 @Controller('user')
 export class UserController {
@@ -14,7 +15,7 @@ export class UserController {
   @Get("me")
   async get(@Req() request: Request,@Res() respone: Response) 
   {
-    const {payload, iat} = request["user"];
+    const payload = request["user"] as UserPayload;
     const userId = Number(payload.id)
     if (!userId)
     {

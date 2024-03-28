@@ -5,12 +5,12 @@ import { User } from "./user";
 export class CookieData
 {
     @PrimaryGeneratedColumn()
-    public id: number
+    public id: number;
 
     @Column()
-    public amount: number
+    public amount: number = 0;
 
     @OneToOne(() => User)
     @JoinColumn()
-    public user: User
+    public user: User = null;
 }

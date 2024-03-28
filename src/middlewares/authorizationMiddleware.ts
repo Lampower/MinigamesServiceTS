@@ -18,7 +18,6 @@ export class AuthMiddleware implements NestMiddleware
             const token_data = req.headers["authorization"];
             const [token_type, token] = token_data.split(" ");
             const payload = await this.authService.verifyAsync(token);
-            const iat = payload["iat"];
             req["user"] = payload;
             next();
         } 

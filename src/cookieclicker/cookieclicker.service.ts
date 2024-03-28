@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CookieData } from 'src/database/models/cookieData';
 import { UserService } from 'src/user/userService';
 import { DataSource, Repository } from 'typeorm';
@@ -31,6 +31,18 @@ export class CookieClickerService {
         });
         return cookieData;
     }
+    async getByUserId(id: number)
+    {
+        const cookieData = await this.cookies.findOne({
+            where: [{
+                user: {
+                    id
+                }
+            }]
+        })
+        return cookieData;
+
+    }
     async setAmount(cookieId: number, amount: number)
     {
         await this.cookies.update({id: cookieId}, {amount});
@@ -38,5 +50,9 @@ export class CookieClickerService {
     async addAmount(cookieId: number, amount: number)
     {
         await this.cookies.update({id: cookieId}, {amount});
+    }
+    async getAll()
+    {
+        return await this.cookies.find();
     }
 }
