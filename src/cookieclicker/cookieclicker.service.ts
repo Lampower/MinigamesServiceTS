@@ -27,7 +27,8 @@ export class CookieClickerService {
     async getById(id: number)
     {
         const cookieData = await this.cookies.findOne({
-            where: {id}
+            where: {id},
+            relations: {user: true}
         });
         return cookieData;
     }
@@ -38,7 +39,9 @@ export class CookieClickerService {
                 user: {
                     id
                 }
-            }]
+            }],
+            relations: {user: true},
+            // relationLoadStrategy: "query"
         })
         return cookieData;
 

@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Req, Res } from "@nestjs/common";
+import { BadRequestException, Body, Controller, HttpStatus, Post, Req, Res } from "@nestjs/common";
 import { Request, Response } from "express";
 import { AuthService } from "src/auth/authService";
 import { UserService } from "src/user/userService";
@@ -24,11 +24,14 @@ export class AuthController
     {
       if (userDto.username == null || userDto.password == null) 
       {
-        response.status(404);
-        response.json("Error");
+        throw new BadRequestException();
       }
-  
- 
+      const exists = await this.userService.check(userDto.username, userDto.password);
+      console.log(exists);
+      if (exists)
+      {
+        throw new BadRequestException();
+      }
   
       const createdUser = await this.userService.create(userDto);
       const userPayload = new UserPayload();
@@ -45,8 +48,7 @@ export class AuthController
       const {username, password} = userDto;
       if (username == null || password == null || !this.userService.check(username, password)) 
       {
-        response.status(HttpStatus.BAD_REQUEST);
-        response.json("Error");
+        throw new BadRequestException();
       }
       const user = await this.userService.getByUsername(username);
       if (!user)
