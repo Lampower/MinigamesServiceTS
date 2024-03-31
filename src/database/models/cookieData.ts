@@ -10,7 +10,7 @@ export class CookieData
     @Column()
     public amount: number = 0;
 
-    @OneToOne(() => User)
+    @OneToOne(() => User, {nullable: false})
     @JoinColumn()
     public user: User = null;
 }

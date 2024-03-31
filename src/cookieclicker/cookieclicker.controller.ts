@@ -18,19 +18,25 @@ export class CookieClickerController
 
         response.json(cookieData);
     }
+    @Get()
+    async getAll(@Res() response: Response)
+    {
+        const cookies = await this.cookieClickerService.getAll();
+        response.json(cookies)
+    }
     @Get('me')
     async get(@Req() request: Request, @Res() response: Response)
     {
-        const cookies = await this.cookieClickerService.getAll() 
-        response.json(cookies);
+        // const cookies = await this.cookieClickerService.getAll() 
+        // response.json(cookies);
 
-        // const userPayload = request["user"] as UserPayload;
-        // if (userPayload == null) throw new BadRequestException();
+        const userPayload = request["user"] as UserPayload;
+        if (userPayload == null) throw new BadRequestException("Auth Problem");
 
-        // const cookieData = await this.cookieClickerService.getByUserId(userPayload.id);
-        // if (cookieData == null) throw new BadRequestException();
+        const cookieData = await this.cookieClickerService.getByUserId(userPayload.id);
+        if (cookieData == null) throw new BadRequestException("No data found");
 
-        // response.json(cookieData);
+        response.json(cookieData);
     }
     @Post('me')
     async addAmount(@Req() request: Request, @Res() response: Response)
@@ -44,4 +50,5 @@ export class CookieClickerController
 
         response.json("Success");
     }
+    
 }
