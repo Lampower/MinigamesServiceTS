@@ -2,7 +2,11 @@ import { Controller, Req, Get, Post, Res, HttpStatus } from '@nestjs/common';
 import { Request, response, Response } from 'express';
 import { UserService } from './userService';
 import { UserPayload } from './dto/userPayload';
+import { ApiBearerAuth, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
+@ApiUnauthorizedResponse({description:"Unauthorized"})
+@ApiBearerAuth()
+@ApiTags("User")
 @Controller('user')
 export class UserController {
   constructor(

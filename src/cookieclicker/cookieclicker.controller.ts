@@ -2,17 +2,25 @@ import { BadRequestException, Controller, Get, Post, Req, Res } from '@nestjs/co
 import { CookieClickerService } from './cookieclicker.service';
 import { Request, Response } from 'express';
 import { UserPayload } from 'src/user/dto/userPayload';
+import { ApiAcceptedResponse, ApiBearerAuth, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
+@ApiUnauthorizedResponse({description: "Unauthorized"})
+@ApiBearerAuth()
+@ApiTags("CookieClicker")
 @Controller('cookieclicker')
 export class CookieClickerController 
 {
     constructor(private readonly cookieClickerService: CookieClickerService) {}
 
+    @ApiResponse({status: 201, description: "Connection with user created"})
+    @ApiResponse({status: 404, description: "Already Exists"})
     @Post("create")
     async createUser(@Req() request: Request, @Res() response: Response)
     {
         const userPayload = request["user"] as UserPayload;
-        console.log(userPayload);
+
+        const isExist = await this.cookieClickerService.getByUserId(userPayload.id);
+        if (isExist) throw new BadRequestException("Already Exists");
 
         const cookieData = await this.cookieClickerService.create(userPayload.id);
 
@@ -38,7 +46,7 @@ export class CookieClickerController
 
         response.json(cookieData);
     }
-    @Post('me')
+    @Post('addAmount')
     async addAmount(@Req() request: Request, @Res() response: Response)
     {
         const {amount } = request.body;

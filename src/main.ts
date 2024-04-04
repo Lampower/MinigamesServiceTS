@@ -9,7 +9,12 @@ async function bootstrap() {
   const config = new DocumentBuilder()
   .setTitle("MinigamesService")
   .setDescription("Desc")
-  .addBasicAuth()
+  .addBearerAuth({
+    type: "apiKey",
+    name: "Authorization",
+    in: "header",
+    description: "Enter the token with the `Bearer: ` prefix, e.g. 'Bearer abcde12345'"
+  })
   .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("swaggerApi", app, document);

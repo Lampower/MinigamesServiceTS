@@ -21,11 +21,18 @@ export class UserService
         const createdUser = await this.users.save(user);
         return createdUser
     }
-    async check(username: string, password: string)
+    async checkPassword(username: string, password: string)
     {
         const user = await this.users.findOne({where: {username}});
-        return user && user.password === password;
-        
+        return user && user.password === password; 
+    }
+    async checkIfExists(username: string)
+    {
+        return await this.users.exists({
+            where: {
+                username: username
+            }
+        })
     }
 
     async getById(id: number = null)
