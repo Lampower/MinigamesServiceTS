@@ -1,26 +1,22 @@
+import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt"
 import { UserPayload } from "src/user/dto/userPayload";
 
+@Injectable()
 export class AuthService 
 {
-    private SECRET_KEY = "MY-SECRET-KEY";
 
-    private readonly jwtService: JwtService = new JwtService({secret: this.SECRET_KEY})
+    constructor(private jwtService: JwtService) {}
 
     async generateToken(user: UserPayload): Promise<string>
     {
-
-        const token = await this.jwtService.signAsync({user}, {
-            secret: this.SECRET_KEY
-        });
+        const token = await this.jwtService.signAsync({user});
         return token;
     }
 
     async verifyAsync(token: string): Promise<UserPayload>
     {
-        const payload = await this.jwtService.verifyAsync(token, {
-            secret: this.SECRET_KEY
-        });
+        const payload = await this.jwtService.verifyAsync(token);
         return payload["user"] as UserPayload;
     }
 }

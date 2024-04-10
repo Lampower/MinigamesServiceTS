@@ -1,10 +1,11 @@
-import { BadRequestException, Body, Controller, HttpStatus, Post, Req, Res } from "@nestjs/common";
-import { Response } from "express";
+import { BadRequestException, Body, Controller, Get, HttpStatus, NotFoundException, Param, Post, Query, Req, Res } from "@nestjs/common";
+import { Request, Response } from "express";
 import { AuthService } from "src/auth/authService";
 import { UserService } from "src/user/userService";
 import { UserPayload } from "src/user/dto/userPayload";
 import { RegistrationDto } from "./dto/registrationDto";
-import { ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiParam, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { LoginResponseDto } from "./dto/loginResponseDto";
 
 
 @ApiTags("Authorization")
@@ -21,17 +22,19 @@ export class AuthController
         this.jwtService = jwtService;
     }
 
+    @ApiResponse({status: 201, type: LoginResponseDto})
+    @ApiResponse({status: 400, "description": "User already exists"})
     @Post("/register")
-    async register(@Body() userDto: RegistrationDto, @Res() response: Response) 
+    async register(@Body() userDto: RegistrationDto, @Res() response: Response)
     {
       if (userDto.username == null || userDto.password == null) 
       {
-        throw new BadRequestException("user already exists");
+        throw new BadRequestException("User already exists");
       }
       const exists = await this.userService.checkIfExists(userDto.username);
       if (exists)
       {
-        throw new BadRequestException("user already exists");
+        throw new BadRequestException("User already exists");
       }
   
       const createdUser = await this.userService.create(userDto);
@@ -40,21 +43,23 @@ export class AuthController
       userPayload.username = createdUser.username;
       const token = await this.jwtService.generateToken(userPayload);
 
-      response.json({id: userPayload.id, token: token});
+      response.json(new LoginResponseDto(userPayload.id, token));
     }
 
+    @ApiResponse({status: 201, type: LoginResponseDto})
+    @ApiResponse({status: 404, description: "This user doesn't exists"})
     @Post("/login")
     async login(@Body() userDto: RegistrationDto, @Res() response: Response)
     {
       const {username, password} = userDto;
-      if (username == null || password == null || !this.userService.checkPassword(username, password)) 
+      if (username == null || password == null || !(await this.userService.checkPassword(username, password))) 
       {
-        throw new BadRequestException("wrong username or password");
+        throw new NotFoundException("This user doesn't exists")
       }
       const user = await this.userService.getByUsername(username);
-      if (!user)
+      if (user == null)
       {
-        response.status(HttpStatus.BAD_GATEWAY).json("Server Error");
+        throw new NotFoundException("This user doesn't exists")
       }
 
       const userPayload = new UserPayload();
@@ -63,6 +68,18 @@ export class AuthController
 
       const token = await this.jwtService.generateToken(userPayload);
 
-      response.json({id: userPayload.id, token: token});
+      response.json(new LoginResponseDto(userPayload.id, token));
+    }
+    @ApiQuery({name: "token", type: "string"})
+    @Get("/check")
+    async check(@Query() query, @Res() response: Response)
+    {
+      const token = query.token;
+      if (!token)
+      {
+        throw new BadRequestException();
+      }
+      const user = await this.jwtService.verifyAsync(token);
+      response.json(user);
     }
 }

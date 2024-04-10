@@ -3,6 +3,10 @@
 /node_modules
 /build
 
+# secrets
+constants.ts
+jwtConfig.ts
+
 # Logs
 logs
 *.log

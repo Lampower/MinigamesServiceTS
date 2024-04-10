@@ -5,9 +5,20 @@ import { AuthMiddleware } from 'src/middlewares/authorizationMiddleware';
 import { AuthService } from 'src/auth/authService';
 import { UserModule } from 'src/user/userModule';
 import { CookieClickerController } from 'src/cookieclicker/cookieclicker.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtKeywords } from 'src/jwtConfig';
 
 @Module({
-    imports: [UserModule],
+    imports: [
+        UserModule, 
+        JwtModule.register({
+            "global": true,
+            "secret": JwtKeywords.secret,
+            "signOptions": {
+                "expiresIn": JwtKeywords.expire_time
+            }
+        })
+    ],
     controllers: [AuthController],
     providers: [AuthService],
     exports: [AuthService]

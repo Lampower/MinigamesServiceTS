@@ -4,7 +4,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 8000
+  const SWAGGER_NAME = "swaggerApi"
   const app = await NestFactory.create(AppModule);
+  const text = `
+    Server is running 
+    http://localhost:${PORT}/
+    Api docs is availible at
+    http://localhost:${PORT}/${SWAGGER_NAME}
+  `
 
   const config = new DocumentBuilder()
   .setTitle("MinigamesService")
@@ -17,10 +24,10 @@ async function bootstrap() {
   })
   .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("swaggerApi", app, document);
+  SwaggerModule.setup(SWAGGER_NAME, app, document);
 
   await app.listen(PORT, () => {
-    console.log(`server port is ${PORT}`)
+    console.log(text)
   });
 }
 
