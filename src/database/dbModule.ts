@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./models/user";
 import { CookieData } from "./models/cookieData";
+import { Comments } from "./models/comments";
 
 
 @Module({
@@ -15,7 +16,7 @@ import { CookieData } from "./models/cookieData";
           database: "minigames",
           synchronize: true,
           logging: false,
-          entities: [User, CookieData],
+          entities: [User, CookieData, Comments],
           migrations: [],
           subscribers: [],
         })

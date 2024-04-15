@@ -11,11 +11,11 @@ export class Comments
     @Column()
     public message: string
 
-    @Column()
-    @OneToOne(() => User)
+    @OneToOne(() => User, {nullable: true})
+    @JoinColumn()
     userRecieved: User
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, {nullable: true})
     @JoinColumn()
     userSender: User
 }

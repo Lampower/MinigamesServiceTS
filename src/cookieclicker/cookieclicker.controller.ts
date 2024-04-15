@@ -1,8 +1,11 @@
-import { BadRequestException, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Post, Put, Req, Res } from '@nestjs/common';
 import { CookieClickerService } from './cookieclicker.service';
 import { Request, Response } from 'express';
 import { UserPayload } from 'src/user/dto/userPayload';
-import { ApiAcceptedResponse, ApiBearerAuth, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiAcceptedResponse, ApiBearerAuth, ApiBody, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { AddAmountDto } from './dto/AddAmountDto';
+import { CookieData } from 'src/database/models/cookieData';
+import { CookieResponseDto } from './dto/CookieResponseDto';
 
 @ApiUnauthorizedResponse({description: "Unauthorized"})
 @ApiBearerAuth()
@@ -26,12 +29,16 @@ export class CookieClickerController
 
         response.json(cookieData);
     }
+    @ApiResponse({status: 200, type: CookieData, isArray: true})
     @Get()
     async getAll(@Res() response: Response)
     {
         const cookies = await this.cookieClickerService.getAll();
         response.json(cookies)
     }
+    @ApiResponse({status: 200, type: CookieResponseDto})
+    @ApiResponse({status: 400})
+    @ApiResponse({status: 404})
     @Get('me')
     async get(@Req() request: Request, @Res() response: Response)
     {
@@ -39,24 +46,30 @@ export class CookieClickerController
         // response.json(cookies);
 
         const userPayload = request["user"] as UserPayload;
-        if (userPayload == null) throw new BadRequestException("Auth Problem");
+        if (userPayload == null) throw new BadRequestException("Auth problem");
 
         const cookieData = await this.cookieClickerService.getByUserId(userPayload.id);
-        if (cookieData == null) throw new BadRequestException("No data found");
-
-        response.json(cookieData);
+        if (cookieData == null) throw new NotFoundException("No data found");
+        const cookieDataResponse = new CookieResponseDto();
+        cookieDataResponse.id = cookieData.id;
+        cookieDataResponse.amount = cookieData.amount;
+        cookieDataResponse.user = cookieData.user;
+        
+        response.json(cookieDataResponse);
     }
-    @Post('addAmount')
-    async addAmount(@Req() request: Request, @Res() response: Response)
+    @ApiBody({type: AddAmountDto})
+    @ApiResponse({status: 200, description: "Success", type: CookieResponseDto})
+    @ApiResponse({status: 404, description: "Cookie data not found"})
+    @Put('addAmount')
+    async addAmount(@Req() request: Request, @Body() data: AddAmountDto, @Res() response: Response)
     {
-        const {amount } = request.body;
         const userPayload = request["user"] as UserPayload;
         
         const cookieData = await this.cookieClickerService.getByUserId(userPayload.id);
+        if (!cookieData) throw new NotFoundException("Cookie data not found");
+        const updatedCookieData = await this.cookieClickerService.addAmount(cookieData.id, data.amount)
 
-        this.cookieClickerService.addAmount(cookieData.id, amount)
-
-        response.json("Success");
+        response.json(updatedCookieData);
     }
     
 }

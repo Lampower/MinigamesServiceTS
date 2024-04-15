@@ -52,7 +52,13 @@ export class CookieClickerService {
     }
     async addAmount(cookieId: number, amount: number)
     {
-        await this.cookies.update({id: cookieId}, {amount});
+        const cookieData = (await this.cookies.findOne({
+            where: {id: cookieId},
+            relations: {user: true}
+        }));
+        cookieData.amount += amount;
+        await this.cookies.save(cookieData);
+        return cookieData;
     }
     async getAll()
     {

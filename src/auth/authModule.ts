@@ -7,10 +7,16 @@ import { UserModule } from 'src/user/userModule';
 import { CookieClickerController } from 'src/cookieclicker/cookieclicker.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtKeywords } from 'src/jwtConfig';
+import { CommentModule } from 'src/comment/comment.module';
+import { CookieClickerModule } from 'src/cookieclicker/cookieclicker.module';
+import { CommentController } from 'src/comment/comment.controller';
+import { METHODS } from 'http';
 
 @Module({
     imports: [
         UserModule, 
+        CookieClickerModule,
+        CommentModule,
         JwtModule.register({
             "global": true,
             "secret": JwtKeywords.secret,
@@ -28,8 +34,9 @@ export class AuthModule implements NestModule
     configure(consumer: MiddlewareConsumer) {
         consumer
             .apply(AuthMiddleware)
+            .exclude({"path": "comments/:id", "method": RequestMethod.GET})
             .forRoutes(
-                UserController, CookieClickerController
+                UserController, CookieClickerController, CommentController
             );
     }
 }

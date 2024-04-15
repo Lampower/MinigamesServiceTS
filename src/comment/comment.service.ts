@@ -27,10 +27,27 @@ export class CommentService {
     }
     async updateComment(commentId: number, text2change: string)
     {
-        await this.comments.update({id: commentId}, {message: text2change});
+        return await this.comments.update({id: commentId}, {message: text2change});
     }
     async deleteComment(commentId: number)
     {
-        await this.comments.delete({id: commentId});
+        return await this.comments.delete({id: commentId});
+    }
+    async getCommentsRecievedByUserId(id: number)
+    {
+        return await this.comments.find({
+            where: {
+                userRecieved: {id}
+            },
+            relations: {userSender: true}
+        });
+    }
+    async getCommentsSentByUserId(id: number)
+    {
+        return await this.comments.find({
+            where: {
+                userSender: {id}
+            }
+        });
     }
 }
